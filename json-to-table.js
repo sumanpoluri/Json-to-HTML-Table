@@ -15,24 +15,59 @@ String.prototype.format = function()
 
 
 /**
+ * Check if object exists in array
+ */
+function containsObject(obj, list) {
+	if (!list) return false;
+	
+    var x;
+    for (x in list) {
+        if (list.hasOwnProperty(x) && list[x] === obj) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * Get header name
+ */
+function getHeaderName(obj, headerNameMap) {
+	if (!headerNameMap) return false;
+	
+	if (headerNameMap.hasOwnProperty(obj)) {
+		return headerNameMap[obj];
+	}
+	
+    return obj;
+}
+
+
+/**
  * Convert a Javascript Oject array or String array to an HTML table
  * JSON parsing has to be made before function call
  * It allows use of other JSON parsing methods like jQuery.parseJSON
  * http(s)://, ftp://, file:// and javascript:; links are automatically computed
  *
  * JSON data samples that should be parsed and then can be converted to an HTML table
- *     var objectArray = '[{"Total":"34","Version":"1.0.4","Office":"New York"},{"Total":"67","Version":"1.1.0","Office":"Paris"}]';
+ *     var objectArray = '[{"tot":"34","ver":"1.0.4","off":"New York","pic":"https://en.wikipedia.org/wiki/New_York_City#/media/File:NYC_Montage_2014_4_-_Jleon.jpg"},{"tot":"67","ver":"1.1.0","off":"Paris","pic":"https://en.wikipedia.org/wiki/Paris#/media/File:Seine_and_Eiffel_Tower_from_Tour_Saint_Jacques_2013-08.JPG"}]';
+ *     var imageColumns = ["pic"];
+ *     var columnNames = {tot: "Total", ver: "Version", off: "Office", pic: "Photo"];
  *     var stringArray = '["New York","Berlin","Paris","Marrakech","Moscow"]';
  *     var nestedTable = '[{ key1: "val1", key2: "val2", key3: { tableId: "tblIdNested1", tableClassName: "clsNested", linkText: "Download", data: [{ subkey1: "subval1", subkey2: "subval2", subkey3: "subval3" }] } }]'; 
  *
  * Code sample to create a HTML table Javascript String
- *     var jsonHtmlTable = ConvertJsonToTable(eval(dataString), 'jsonTable', null, 'Download');
+ *     var jsonHtmlTable = ConvertJsonToTable(eval(dataString), 'jsonTable', null, 'Download', imageColumns, columnNames);
  *
  * Code sample explaned
  *  - eval is used to parse a JSON dataString
  *  - table HTML id attribute will be 'jsonTable'
  *  - table HTML class attribute will not be added
  *  - 'Download' text will be displayed instead of the link itself
+ *  - imageColumns array defines which headers contain image URLs
+ *  - columnNames array defines what names should show in the HTML header
  *
  * @author Afshin Mehrabani <afshin dot meh at gmail dot com>
  * 
@@ -44,15 +79,18 @@ String.prototype.format = function()
  * @param tableId string Optional table id 
  * @param tableClassName string Optional table css class name
  * @param linkText string Optional text replacement for link pattern
+ * @param imgHeaders array Optional defines which headers contain image URLs
+ * @param headerNames array Optional defines what names should show in the HTML headers
  *  
  * @return string Converted JSON to HTML table
  */
-function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText)
+function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText, imgHeaders, headerNames)
 {
     //Patterns for links and NULL value
     var italic = '<i>{0}</i>';
     var link = linkText ? '<a href="{0}">' + linkText + '</a>' :
                           '<a href="{0}">{0}</a>';
+    var image = '<a href="{0}" target="_blank"><img src="{0}" alt="Photo"></img></a>';
 
     //Pattern for table                          
     var idMarkup = tableId ? ' id="' + tableId + '"' :
@@ -89,8 +127,10 @@ function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText)
             {
                 headers = array_keys(parsedJson[0]);
 
-                for (i = 0; i < headers.length; i++)
-                    thCon += thRow.format(headers[i]);
+                for (i = 0; i < headers.length; i++) {
+                	headerName = getHeaderName(headers[i], headerNames);
+                    thCon += thRow.format(headerName);
+                }
             }
         }
         th = th.format(tr.format(thCon));
@@ -119,14 +159,19 @@ function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText)
                         var value = parsedJson[i][headers[j]];
                         var isUrl = urlRegExp.test(value) || javascriptRegExp.test(value);
 
-                        if(isUrl)   // If value is URL we auto-create a link
-                            tbCon += tdRow.format(link.format(value));
+                        if(isUrl) {   // If value is URL we auto-create a link
+                            if (containsObject(headers[j], imgHeaders)) {
+                        		tbCon += tdRow.format(image.format(value));
+                            } else {
+                            	tbCon += tdRow.format(link.format(value));
+                            }
+                        }
                         else
                         {
                             if(value){
                             	if(typeof(value) == 'object'){
                             		//for supporting nested tables
-                            		tbCon += tdRow.format(ConvertJsonToTable(eval(value.data), value.tableId, value.tableClassName, value.linkText));
+                            		tbCon += tdRow.format(ConvertJsonToTable(eval(value.data), value.tableId, value.tableClassName, value.linkText, imgHeaders, null));
                             	} else {
                             		tbCon += tdRow.format(value);
                             	}
