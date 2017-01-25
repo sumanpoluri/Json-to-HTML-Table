@@ -1,15 +1,13 @@
-## Annoucement: We are working to develop and release a full-featured Javascript table library. Links will be added to this repo soon.
-
 JSON to HTML Table
 ==================
 
-This is a simple script to convert JSON data to standard HTML table in the simplest and fastest way.
+This is a fork of the JSON To HTML table project of Afshin Mehrabani (https://github.com/afshinm/Json-to-HTML-Table).
 
 ##How to use
 There's only one function in this library and accept four parameter that only the first one is required.
     
 ```javascript
-    function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText)
+    function ConvertJsonToTable(parsedJson, tableId, tableClassName, linkText, imgHeaders, headerNames)
 ```
     
 Simply call `ConvertJsonToTable` method and fill the `parsedJson` parameter.  
@@ -21,17 +19,25 @@ This is an example of using this library:
 ```javascript
     //Example data, Object 
     var objectArray = [{
-        "Total": "34",
-        "Version": "1.0.4",
-        "Office": "New York"
+        "tot": "34",
+        "ver": "1.0.4",
+        "off": "New York",
+        "pic": "https://en.wikipedia.org/wiki/New_York_City#/media/File:NYC_Montage_2014_4_-_Jleon.jpg"
     }, {
-        "Total": "67",
-        "Version": "1.1.0",
-        "Office": "Paris"
+        "tot": "67",
+        "ver": "1.1.0",
+        "off": "Paris",
+        "pic": "https://en.wikipedia.org/wiki/Paris#/media/File:Seine_and_Eiffel_Tower_from_Tour_Saint_Jacques_2013-08.JPG"
     }];
     
     //Example data, Array
     var stringArray = ["New York", "Berlin", "Paris", "Marrakech", "Moscow"];
+    
+    //Example data for image headers, Array
+    var imageColumns = ["pic"];
+    
+    //Example data for column names, Object
+    var columnNames = {tot: "Total", ver: "Version", off: "Office", pic: "Photo"];
     
     //Example data, nested Object. This data will create nested table also.
     var nestedTable = [{
@@ -54,7 +60,7 @@ Code sample to create a HTML table from JSON:
 
 ```javascript
     //Only first parameter is required
-    var jsonHtmlTable = ConvertJsonToTable(objectArray, 'jsonTable', null, 'Download');
+    var jsonHtmlTable = ConvertJsonToTable(objectArray, 'jsonTable', null, 'Download', imageColumns, columnNames);
 ```
 
 Code sample explaned:
@@ -62,6 +68,8 @@ Code sample explaned:
  - table HTML id attribute will be **jsonTable**
  - table HTML class attribute will not be added
  - **Download** text will be displayed instead of the link itself
+ - imageColumns array defines which headers contain image URLs
+ - columnNames array defines what names should show in the HTML header
 
 ##Contributors
 [Afshin Mehrabani](https://github.com/afshinm) (@afshinmeh)  
