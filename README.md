@@ -3,7 +3,7 @@ JSON to HTML Table
 
 This is a fork of the JSON To HTML table project of Afshin Mehrabani (https://github.com/afshinm/Json-to-HTML-Table).
 
-##How to use
+## How to use
 There's only one function in this library and accept four parameter that only the first one is required.
     
 ```javascript
@@ -12,7 +12,7 @@ There's only one function in this library and accept four parameter that only th
     
 Simply call `ConvertJsonToTable` method and fill the `parsedJson` parameter.  
 
-##Example
+## Example
 
 This is an example of using this library:  
 
@@ -71,15 +71,15 @@ Code sample explaned:
  - imageColumns array defines which headers contain image URLs
  - columnNames array defines what names should show in the HTML header
 
-##Contributors
+## Contributors
 [Afshin Mehrabani](https://github.com/afshinm) (@afshinmeh)  
 [Sgissinger](https://github.com/sgissinger) 
 
-##Contributing
+## Contributing
 
 This is a open-source project. Fork the project, complete the code and send pull request.
 
-##License
+## License
 
     Copyright (C) 2012 Afshin Mehrabani (afshin.meh@gmail.com)
     
